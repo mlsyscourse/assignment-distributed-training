@@ -265,7 +265,77 @@ To test your implementations, please run
 mpirun -n 4 python3 -m pytest -l -v --with-mpi tests/test_collect_weight_grad.py
 ```
 
-### Part 8. Unified Training
+## ZeRO-DP Background
+
+So far, we have used classic data parallel training where parameters, gradients, and optimizer states are all replicated
+on every DP rank. This is simple, but memory usage grows quickly as model size increases.
+
+In this extension, we assume the system is already in **ZeRO Stage 3**, where parameters, gradients,
+and optimizer states are all sharded across data-parallel ranks.
+
+Instead of adding helper functions in `model/func_impl.py`, we create a standalone module
+`model/zero_dp_stage3.py` with:
+
+- a custom FC layer (`ZeroDPStage3FCLayer`) that stores only local parameter shards
+- a simple Adam optimizer (`ZeroDPAdam`) that maintains local optimizer-state shards
+
+Your implementation should focus on communication and tensor-sharding logic in Stage 3:
+
+- `Allgather` for reconstructing full parameters during forward/backward
+- `Reduce_scatter` for collecting reduced gradient shards
+- shard-local Adam state updates for optimizer moments
+
+For conceptual background, read the ZeRO paper:
+`ZeRO: Memory Optimizations Toward Training Trillion Parameter Models (Rajbhandari et al., SC'20)`, or review the lecture material.
+
+### Part 8. ZeRO Stage 3 FC Layer Forward/Backward (20 pts/20 pts)
+
+In this part, your task is to implement the `_partition_flat_tensor` and `forward`, which are used for forward pass, and `backward`, which is used during backward pass, in
+`model/zero_dp_stage3.py` for the `ZeroDPStage3FCLayer` class.
+
+Key requirements:
+
+- `_partition_flat_tensor` should support non-divisible tensor sizes by zero-padding. In real-world scenarios, AI architecture designers never create tensors that cannot be evenly divided across devices. Here, however, because we are using very simple test cases, we intentionally use non-divisible tensors to encourage you to think about the memory layout of the partitioned parameters.
+- Each rank stores only local shards of weight and bias.
+- Forward pass should all-gather shards to reconstruct full parameters and compute FC output.
+- Backward pass should compute local full gradients, reduce-scatter them into local gradient shards,
+  and return `grad_x`.
+- Don't try to keep the full weights across devices, which will fail the autograder!
+
+To test your implementation, run:
+
+```bash
+python3 -m pytest -l -v tests/test_zero_dp_stage3_partition.py
+mpirun -n 4 python3 -m pytest -l -v --with-mpi tests/test_zero_dp_stage3_fc_forward.py
+mpirun -n 4 python3 -m pytest -l -v --with-mpi tests/test_zero_dp_stage3_fc_backward.py
+```
+
+Notes:
+
+- Each of the above test files contains at least two hardcoded test cases.
+- The test data uses small integer values so you can manually verify communication and sharding logic.
+
+### Part 9. ZeRO Stage 3 Adam Optimizer State (10 pts)
+
+In this part, your task is to implement `step` in `ZeroDPAdam` in `model/zero_dp_stage3.py`. Specific instructions are given in the comments.
+
+Key requirements:
+
+- optimizer states (`m`, `v`) should be maintained for local parameter shards only
+- Keeping a higher-precision copy of the weights is optional, since we are on CPU and using float32 already.
+
+We validate this part with end-to-end training based on `zero_dp_train.py`:
+
+- train for 1 epoch
+- require final test accuracy > 85%
+
+To run the training-based check, run:
+
+```bash
+python3 -m pytest -l -v tests/test_zero_dp_stage3_adam.py
+```
+
+### Part 10. Unified Training
 
 Now that you have implemented all required communication functions for model/data parallel training.
 The actual training can be tested by running:
