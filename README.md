@@ -286,10 +286,15 @@ Your implementation should focus on communication and tensor-sharding logic in S
 For conceptual background, read the ZeRO paper:
 `ZeRO: Memory Optimizations Toward Training Trillion Parameter Models (Rajbhandari et al., SC'20)`, or review the lecture material.
 
-### Part 8. ZeRO Stage 3 FC Layer Forward/Backward (20 pts/20 pts)
+### Part 8. ZeRO Stage 3 FC Layer Forward/Backward (40 pts)
 
-In this part, your task is to implement the `_partition_flat_tensor` and `forward`, which are used for forward pass, and `backward`, which is used during backward pass, in
-`model/zero_dp_stage3.py` for the `ZeroDPStage3FCLayer` class.
+In this part, your task is to implement:
+
+- `_partition_flat_tensor` (task8 10 pts) 
+- `forward` (task9 10 pts), which are used for forward pass, 
+- `backward` (task10 20 pts), which is used during backward pass, 
+
+in `model/zero_dp_stage3.py` for the `ZeroDPStage3FCLayer` class.
 
 Key requirements:
 
@@ -313,7 +318,7 @@ Notes:
 - Each of the above test files contains at least two hardcoded test cases.
 - The test data uses small integer values so you can manually verify communication and sharding logic.
 
-### Part 9. ZeRO Stage 3 Adam Optimizer State (10 pts)
+### Part 9. ZeRO Stage 3 Adam Optimizer State (task11 10 pts)
 
 In this part, your task is to implement `step` in `ZeroDPAdam` in `model/zero_dp_stage3.py`. Specific instructions are given in the comments.
 
@@ -403,6 +408,27 @@ or **otherwise the autograder may not process your submission properly**.
 
 If you are enrolled in the course (on SIO), but not registered on Autolab, please let the course staff know in a private post on Piazza.
 
+### Grading Rubric.
+
+In this assignment, there are 11 tasks worth 150 points in total, which will be autograded on autolab. The points for each task are:
+
+```
+task01 10pts
+task02 20pts
+task03 15pts
+task04 15pts
+task05 20pts
+task06 10pts
+task07 10pts
+task08 10pts
+task09 10pts
+task10 20pts
+task11 10pts
+```
+
+For each task, you either get full credits for passing all test cases, including potential hidden ones, or zero for failing any of them.
+
+The final grade will be scaled back to 100 points in total. Therefore, your final grade would be `(autograded score) / 150 * 100`.
 
 #### References 
 
