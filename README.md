@@ -375,9 +375,9 @@ for next years.
 We will be using the auto-grading feature in GradeScope to score your submission for this assignment, so please follow the instructions 
 carefully to align with the auto-grader hand-in requirements.
 
-Now in your assignment3 root directory run
+Now in your assignment root directory run
 ```bash
-tar cvf handin.tar model/func_impl.py data/data_parallel_preprocess.py feedback.txt
+tar cvf handin.tar model/func_impl.py data/data_parallel_preprocess.py feedback.txt model/zero_dp_stage3.py
 ```
 This will create a zip file with `func_impl.py`, `data_parallel_preprocess.py` and `feedback.txt`.
 You can check the contents of `handin.tar` with 

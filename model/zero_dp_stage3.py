@@ -103,7 +103,7 @@ class ZeroDPStage3FCLayer(object):
                 This should include the padded elements if there is any.
             
             shard_size : int
-                the number of elements in each shard **excluding padding**.
+                the number of elements in each shard **including padding**.
         """
 
         """TODO: Your code here"""
