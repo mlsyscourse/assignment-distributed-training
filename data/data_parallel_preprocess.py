@@ -41,9 +41,14 @@ def split_data(
         do not shuffle the index as we will shuffle them later
     """
 
-    """TODO: Your code here"""
+    dp_idx = rank // mp_size
+    
+    n = x_train.shape[0]
+    data_per_dp = n // dp_size
+    start_idx = dp_idx * data_per_dp
+    end_idx = (dp_idx + 1) * data_per_dp
 
-    # Try to get the correct start_idx and end_idx from dp_size, mp_size and rank and return
-    # the corresponding data
+    split_x_train = x_train[start_idx:end_idx]
+    split_y_train = y_train[start_idx:end_idx]
 
-    raise NotImplementedError
+    return split_x_train, split_y_train
